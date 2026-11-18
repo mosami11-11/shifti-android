@@ -16,6 +16,12 @@ input{background:#0f1928;color:var(--text);border:1px solid #34445d;border-radiu
 <body><main>
 <header class="top"><div><div class="brand">شيفتي <span style="color:var(--green)">●</span></div><div class="sub">سجّل شيفتك واحسب فلوسك فورًا</div></div><div class="pill">350 ₽ / ساعة</div></header>
 <section class="hero"><div class="eyebrow">إجمالي أرباح الشهر الحالي</div><div class="money" id="monthMoney">0 ₽</div><div class="stats"><div class="stat"><b id="daysCount">0</b><span>يوم شغل</span></div><div class="stat"><b id="hoursCount">0</b><span>ساعة مدفوعة</span></div><div class="stat"><b id="allMoney">0 ₽</b><span>كل المسجل</span></div></div></section>
+<section class="card">
+<div class="row"><h2 style="margin:0">مزامنة التقويم</h2><span class="pill" id="calendarStatus">غير متصل</span></div>
+<p class="muted" style="line-height:1.7;margin:10px 0">هيقرأ التطبيق الأيام اللي عنوانها <b style="color:var(--green)">Work day</b> من تقويم الموبايل، ويسجل كل يوم تلقائيًا بـ <b style="color:var(--green)">4,200 ₽</b>.</p>
+<button class="btn work" style="width:100%" onclick="syncCalendar()">↻ ربط التقويم ومزامنة الأيام</button>
+<p class="muted" id="calendarMessage" style="margin:10px 0 0">اضغط للمزامنة واسمح بإذن قراءة التقويم عند الطلب.</p>
+</section>
 <section class="card"><h2>سجّل يومك بسرعة</h2><div class="actions"><button class="btn work" onclick="showTemplates()">＋ اشتغلت النهارده</button><button class="btn rest" onclick="saveRest()">☾ كنت راحة</button></div><div id="templates" hidden style="margin-top:12px"><div class="templates">
 <button class="template" onclick="addShift('10:00','23:00')"><b>10 ص – 11 م</b><small>12 ساعة · 4,200 ₽</small></button>
 <button class="template" onclick="addShift('11:00','00:00')"><b>11 ص – 12 ليلًا</b><small>12 ساعة · 4,200 ₽</small></button>
@@ -29,6 +35,30 @@ input{background:#0f1928;color:var(--text);border:1px solid #34445d;border-radiu
 </main>
 <script>
 const $=id=>document.getElementById(id);let data=JSON.parse(localStorage.getItem('shiftData')||'{}');
+function syncCalendar(){
+  $('calendarMessage').textContent='جاري قراءة التقويم...';
+  if(window.AndroidCalendar && AndroidCalendar.sync){AndroidCalendar.sync();}
+  else {$('calendarMessage').textContent='ميزة التقويم متاحة من نسخة التطبيق على أندرويد.';}
+}
+window.onCalendarSync=function(raw){
+  let dates=[];try{dates=JSON.parse(raw||'[]')}catch(e){}
+  let keep=new Set(dates);
+  for(let [d,v] of Object.entries(data)){if(v&&v.source==='calendar'&&!keep.has(d))delete data[d]}
+  let added=0;
+  dates.forEach(d=>{
+    if(!data[d]||data[d].source==='calendar'){
+      data[d]={type:'work',start:'10:00',end:'23:00',break:1,hours:12,amount:4200,source:'calendar'};
+      added++;
+    }
+  });
+  data.calendarConnected=true;save();
+  $('calendarStatus').textContent='متصل';
+  $('calendarMessage').textContent='تمت المزامنة: '+dates.length+' يوم Work day. الأجر التلقائي 4,200 ₽ لكل يوم.';
+};
+window.onCalendarSyncError=function(message){
+  $('calendarStatus').textContent='غير متصل';
+  $('calendarMessage').textContent=message;
+};
 function iso(){let d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
 $('date').value=iso();
 function save(){localStorage.setItem('shiftData',JSON.stringify(data));render()}
@@ -45,4 +75,5 @@ $('monthMoney').textContent=fmt(sum(m))+' ₽';$('daysCount').textContent=works.
 $('records').innerHTML=entries.length?entries.map(([d,v])=>`<div class="day"><div><strong>${d}</strong><small>${v.type==='rest'?'راحة':`${v.start} – ${v.end} · بريك ${v.break} س · ${fmt(v.hours)} ساعة مدفوعة`}</small></div><div class="row"><span class="amount">${v.type==='rest'?'راحة':fmt(v.amount)+' ₽'}</span><button class="delete" onclick="removeDay('${d}')">حذف</button></div></div>`).join(''):'<p class="muted" style="text-align:center">لسه مفيش أيام متسجلة. ابدأ بزر «اشتغلت النهارده».</p>';
 $('rate').value=data.rate??350;$('defaultBreak').value=data.defaultBreak??1}
 render();
+if(data.calendarConnected){$('calendarStatus').textContent='متصل';$('calendarMessage').textContent='المزامنة التلقائية تعمل عند فتح التطبيق إذا كان إذن التقويم مفعّلًا.';}
 </script></body></html>
