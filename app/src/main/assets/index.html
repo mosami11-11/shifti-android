@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827"><title>شيفتي | حساب الشغل</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#151f30;--panel2:#1c2940;--muted:#9aa9bf;--text:#f4f7fb;--green:#36d399;--blue:#72a7ff;--red:#ff7885}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101b2d,#080d17 65%);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);min-height:100vh;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+main{max-width:520px;margin:auto;padding:22px 0 40px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.brand{font-size:24px;font-weight:800}.sub{color:var(--muted);font-size:13px}.pill{background:#20334b;color:#b9d4ff;padding:7px 11px;border-radius:20px;font-size:12px}
+.hero{background:linear-gradient(135deg,#1c3650,#17283d);border:1px solid #34506d;border-radius:24px;padding:20px;margin-bottom:14px;box-shadow:0 12px 35px #0004}.eyebrow{color:#b9c9df;font-size:13px}.money{font-size:38px;font-weight:850;letter-spacing:-1px;margin:5px 0}.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:15px}.stat{background:#ffffff0c;border-radius:14px;padding:10px}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:#c2d0e2}
+.card{background:var(--panel);border:1px solid #26354b;border-radius:20px;padding:16px;margin:12px 0}.card h2{font-size:16px;margin:0 0 12px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:14px;padding:14px 10px;font:inherit;font-weight:750;cursor:pointer}.work{background:var(--green);color:#06251b}.rest{background:#29374c;color:#e5edf8}.btn:active{transform:scale(.98)}
+.templates{display:grid;grid-template-columns:1fr 1fr;gap:8px}.template{background:var(--panel2);border:1px solid #34445d;color:var(--text);padding:12px;border-radius:13px;text-align:center;font:inherit;cursor:pointer}.template b{display:block;font-size:15px}.template small{color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.muted{color:var(--muted);font-size:12px}.days{display:grid;gap:8px}.day{display:flex;justify-content:space-between;align-items:center;background:#1b293c;border-radius:13px;padding:11px 12px}.day strong{font-size:14px}.day small{display:block;color:var(--muted);margin-top:3px}.amount{font-weight:800;color:var(--green);white-space:nowrap}.delete{border:0;background:#3a2631;color:#ff9aa4;border-radius:9px;padding:6px 9px;margin-right:6px}
+input{background:#0f1928;color:var(--text);border:1px solid #34445d;border-radius:10px;padding:10px;font:inherit;width:100%;min-width:0}label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.settings{display:grid;grid-template-columns:1fr 1fr;gap:10px}.foot{text-align:center;color:#718198;font-size:11px;margin-top:18px}
+</style></head>
+<body><main>
+<header class="top"><div><div class="brand">شيفتي <span style="color:var(--green)">●</span></div><div class="sub">سجّل شيفتك واحسب فلوسك فورًا</div></div><div class="pill">350 ₽ / ساعة</div></header>
+<section class="hero"><div class="eyebrow">إجمالي أرباح الشهر الحالي</div><div class="money" id="monthMoney">0 ₽</div><div class="stats"><div class="stat"><b id="daysCount">0</b><span>يوم شغل</span></div><div class="stat"><b id="hoursCount">0</b><span>ساعة مدفوعة</span></div><div class="stat"><b id="allMoney">0 ₽</b><span>كل المسجل</span></div></div></section>
+<section class="card"><h2>سجّل يومك بسرعة</h2><div class="actions"><button class="btn work" onclick="showTemplates()">＋ اشتغلت النهارده</button><button class="btn rest" onclick="saveRest()">☾ كنت راحة</button></div><div id="templates" hidden style="margin-top:12px"><div class="templates">
+<button class="template" onclick="addShift('10:00','23:00')"><b>10 ص – 11 م</b><small>12 ساعة · 4,200 ₽</small></button>
+<button class="template" onclick="addShift('11:00','00:00')"><b>11 ص – 12 ليلًا</b><small>12 ساعة · 4,200 ₽</small></button>
+<button class="template" onclick="addShift('10:00','21:00')"><b>10 ص – 9 م</b><small>10 ساعات · 3,500 ₽</small></button>
+<button class="template" onclick="addShift('11:00','21:00')"><b>11 ص – 9 م</b><small>9 ساعات · 3,150 ₽</small></button>
+</div><p class="muted">كل اختيار بيخصم ساعة بريك تلقائيًا. تقدر تسجل يوم مختلف من التعديل اليدوي بالأسفل.</p></div></section>
+<section class="card"><h2>تسجيل أو تعديل شيفت بالتوقيت</h2><div class="fields"><div><label>التاريخ</label><input type="date" id="date"></div><div><label>بداية الشيفت</label><input type="time" id="start" value="10:00"></div><div><label>نهاية الشيفت</label><input type="time" id="end" value="23:00"></div><div><label>البريك غير المدفوع (ساعة)</label><input type="number" id="break" value="1" min="0" max="12" step=".5"></div></div><button class="btn work" style="width:100%;margin-top:12px" onclick="addCustom()">احسب وسجّل اليوم</button></section>
+<section class="card"><div class="row"><h2 style="margin:0">سجل الأيام</h2><span class="muted" id="recordCount">0 تسجيل</span></div><div class="days" id="records" style="margin-top:12px"></div></section>
+<section class="card"><h2>إعدادات الأجر</h2><div class="settings"><div><label>الأجر في الساعة (₽)</label><input id="rate" type="number" value="350" min="0" onchange="saveSettings()"></div><div><label>البريك الافتراضي (ساعة)</label><input id="defaultBreak" type="number" value="1" min="0" step=".5" onchange="saveSettings()"></div></div><p class="muted">البيانات محفوظة على نفس الموبايل والمتصفح.</p></section>
+<div class="foot">شيفتي · حساباتك بتتحدث تلقائيًا</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);let data=JSON.parse(localStorage.getItem('shiftData')||'{}');
+function iso(){let d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
+$('date').value=iso();
+function save(){localStorage.setItem('shiftData',JSON.stringify(data));render()}
+function saveSettings(){data.rate=Number($('rate').value)||0;data.defaultBreak=Number($('defaultBreak').value)||0;save()}
+function showTemplates(){$('templates').hidden=!$('templates').hidden;$('date').value=iso()}
+function mins(t){let [h,m]=t.split(':').map(Number);return h*60+m}
+function addShift(s,e){$('date').value=iso();$('start').value=s;$('end').value=e;$('break').value=data.defaultBreak??1;addCustom()}
+function addCustom(){let date=$('date').value,s=$('start').value,e=$('end').value,b=Number($('break').value);if(!date||!s||!e||b<0){alert('راجع التاريخ والتوقيت والبريك');return}let duration=mins(e)-mins(s);if(duration<=0)duration+=1440;let paid=Math.max(0,duration/60-b),rate=Number($('rate').value)||350;data[date]={type:'work',start:s,end:e,break:b,hours:paid,amount:Math.round(paid*rate*100)/100};$('templates').hidden=true;save()}
+function saveRest(){let d=iso();data[d]={type:'rest'};save()}
+function removeDay(d){if(confirm('تمسح تسجيل اليوم ده؟')){delete data[d];save()}}
+function fmt(n){return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n)}
+function render(){let entries=Object.entries(data).filter(([d,v])=>v&&v.type).sort((a,b)=>b[0].localeCompare(a[0]));let works=entries.filter(x=>x[1].type==='work'),month=iso().slice(0,7);let m=works.filter(x=>x[0].startsWith(month));let sum=a=>a.reduce((s,x)=>s+(x[1].amount||0),0),hrs=a=>a.reduce((s,x)=>s+(x[1].hours||0),0);
+$('monthMoney').textContent=fmt(sum(m))+' ₽';$('daysCount').textContent=works.length;$('hoursCount').textContent=fmt(hrs(works));$('allMoney').textContent=fmt(sum(works))+' ₽';$('recordCount').textContent=entries.length+' تسجيل';
+$('records').innerHTML=entries.length?entries.map(([d,v])=>`<div class="day"><div><strong>${d}</strong><small>${v.type==='rest'?'راحة':`${v.start} – ${v.end} · بريك ${v.break} س · ${fmt(v.hours)} ساعة مدفوعة`}</small></div><div class="row"><span class="amount">${v.type==='rest'?'راحة':fmt(v.amount)+' ₽'}</span><button class="delete" onclick="removeDay('${d}')">حذف</button></div></div>`).join(''):'<p class="muted" style="text-align:center">لسه مفيش أيام متسجلة. ابدأ بزر «اشتغلت النهارده».</p>';
+$('rate').value=data.rate??350;$('defaultBreak').value=data.defaultBreak??1}
+render();
+</script></body></html>
